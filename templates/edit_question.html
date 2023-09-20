@@ -1,0 +1,125 @@
+<html>
+
+<head>
+   <title>Modifier question</title>
+   {% include 'includes/head_common.html' %}
+
+   <script src="{{ url_for('static', filename = 'questions_functions.js') }} "></script>
+
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+   <script>
+      window.onload = function () {
+         let answer_list = {{ question['answers'] | tojson
+      }};
+      for (let i = 0; i < answer_list.length; i++) {
+         addAnswer(answer_list[i]['text'], answer_list[i]['isCorrect']);
+      }
+      majInputEtiquettes();
+        }
+      $(function () {
+         $("#input_etiquette").autocomplete({
+            source: {{ etiquettes_existantes | tojson }}
+            });
+        });
+
+      $(function () {
+         $('[data-toggle="tooltip"]').tooltip()
+      })
+   </script>
+</head>
+
+<body>
+
+   <div>
+      <div class="container-fluid bg-dark text-light py-3">
+         <header class="text-center">
+            <h1 class="display-6">Modification de question</h1>
+         </header>
+      </div>
+   </div>
+   <center style="display:flex ; flex-direction: row; justify-content: center; margin: 10px;">
+      <section class="container my-2 bg-dark w-60 text-light p-2 col-12"
+         style="box-shadow: 0px 0px 10px white; padding: 5px; display:flex ; flex-direction: column; justify-content: center; ">
+         <form method="post" style="margin-top: 10px;">
+            <div id="form-etiquettes"
+               style="box-sizing: solid white 1px; padding: 10px; display:flex ; flex-direction: column; justify-content: center; margin: 10px;">
+               <label for="etiquette" class="text-light text-center display-12"><strong>Etiquettes</strong></label>
+               <div id="etiquettes-list"
+                  style="display:flex ; flex-direction: row; justify-content: center; margin: 10px;">
+                  {% for etiquette in question.etiquettes %}
+                  <div id="{{ etiquette }}" class="etiquette">
+                     <button type="button" onclick="delEtiquette('{{ etiquette }}')" class="btn btn-primary btn-sm"
+                        style="margin: 7px;" data-bs-toggle="tooltip" data-bs-placement="top"
+                        title="appuyez pour supprimer">
+                        {{ etiquette }}
+                     </button>
+
+                  </div>
+                  {% endfor %}
+               </div>
+               <input type="hidden" name="etiquettes" value="" id="etiquettes">
+               <div id="add_etiquette">
+                  <input class="form-control form-control-md" style="width: 400px;" id="input_etiquette"
+                     placeholder="Ajouter une étiquette">
+                  <button type="button" class="btn btn-labeled " onclick="addEtiquette()">
+                     <span class="btn-label "><i class="fa fa-plus-circle fa-lg" style="color:white;"
+                           aria-hidden="true"></i></span></button>
+               </div>
+            </div>
+
+            <div class="card bg-dark" style="width: 25rem; box-shadow: 0px 0px 10px white; padding: 10px;">
+               <div class="card-body" style="display:flex; flex-direction:column; justify-content:center;">
+                  <input id="type_question" type="text" class="card-title" readonly value="{{ question.type }}"
+                     name="type"
+                     style="background-color: transparent; text-align: center; font-size: large ; font-weight:600 ;color:white; border: none;">
+
+                  <input class="form-control" style="background-color: rgb(255, 208, 243);" id="titre" name="titre"
+                     placeholder="Titre de la question" value="{{ question.titre }}" required>
+                  <label for="qst"><strong>Question :</strong></label>
+                  <textarea class="form-control" id="qst" name="text" style="background-color: #EBFCCB;" rows="3"
+                     cols="33" required>{{ question.text }}</textarea>
+               </div>
+               {% if question.type == "ChoixMultiple" %}
+               <div id="answers" class="container my-2 bg-dark w-80 text-light p-2"
+                  style="display:flex; flex-direction: column;justify-content: center;align-items: center; padding: 10px;">
+               </div>
+               <input type="hidden" name="answers_json" value="" id="answers_json">
+               <div class="card-body">
+                  <button type="button" class="btn btn-labeled " onclick="addAnswer()">
+                     <span class="btn-label "><i class="fa fa-plus-circle fa-lg" style="color:white;"
+                           aria-hidden="true"></i></span></button>
+                  <input type="submit" name="submit" class="btn btn-success" value="Confirmer" onclick="majAnswers()">
+                  <input type="hidden" name="id_question" value="{{ id_question }}">
+                  <input type="hidden" name="id_question_unique" value="{{ question.id }}">
+               </div>
+               {% elif question.type == "Alphanumerique" %}
+               <div class="card-body">
+                  <h5 style="margin: 10px;"><strong>Reponse :</strong></h5>
+                  <textarea class="form-control form" id="rep" name="rep" style="background-color: #EBFCCB;" rows="1"
+                     cols="27" placeholder="Ex : c'est Johnatan" required>{{ question.answers }}</textarea>
+                  <input type="submit" name="submit" class="btn btn-success" value="Confirmer" style="margin: 10px">
+                  <input type="hidden" name="id_question" value="{{ id_question }}">
+                  <input type="hidden" name="id_question_unique" value="{{ question.id }}">
+               </div>
+               {% endif %}
+            </div>
+            </div>
+         </form>
+         <div style="margin-top: 5px;">
+            <form action="{{ url_for('visualiser_temp') }}" method='post' target="_blank">
+               <input type="hidden" name="question_json" id="question_json">
+               <input type="submit" name="submit" class="btn btn-success" value="Visualiser" onclick="visualiser()">
+            </form>
+            <form action="{{ url_for('questions') }}">
+               <input type="submit" class="btn btn-dark" value="Retour">
+            </form>
+         </div>
+      </section>
+   </center>
+</body>
+
+</html>

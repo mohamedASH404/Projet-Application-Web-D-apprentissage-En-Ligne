@@ -1,0 +1,30 @@
+<html>
+
+<head>
+   <title>QuizzGalaxy</title>
+   {% include 'includes/head_common.html' %}
+</head>
+
+<body class="main-head">
+   <header class=" bg-dark text-light py-2 text-center">
+      <h1 class="display-6" id="logo">QuizzGalaxy</h1>
+   </header>
+   <section class="hero">
+      {% include 'includes/message.html' %}
+      <h2><strong>Bienvenue sur QuizzGalaxy</strong></h2>
+      <h4>Vous êtes enseignant ? Connectez vous ou créez un compte à accèdez à l'espace de <i>Création/Modification des
+            questions</i></h4>
+      <h4>Vous êtes étudiant ? C'est le site parfait pour s'entrainer ! </h4>
+      <div style="display:flex; flex-direction: row ;justify-content: center;align-items: center; margin-top: 20px;">
+
+         <form action="{{ url_for('login')}}">
+            <button type="submit" class="btn btn-outline-warning btn-lg">Enseignant</button>
+         </form>
+         <form action="{{ url_for('login_etudiant')}}">
+            <button type="submit" class="btn btn-outline-info btn-lg" style="margin-left: 20px;">Élève</button>
+         </form>
+      </div>
+   </section>
+</body>
+
+</html>

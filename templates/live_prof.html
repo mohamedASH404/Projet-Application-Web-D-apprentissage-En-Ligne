@@ -1,0 +1,458 @@
+<html>
+
+<head>
+   <title>Live professeur</title>
+   {% include 'includes/head_common.html' %}
+   {% include 'includes/head_visualiser.html' %}
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"></script>
+      <script src="https://d3js.org/d3.v7.min.js"></script>
+      <script src="{{ url_for('static', filename = 'd3.layout.cloud.js') }} "></script>
+      <script src="https://d3js.org/d3.v7.min.js"></script>
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-cloud/1.2.5/d3.layout.cloud.min.js"></script>
+      <script>
+      var socket;
+      var type;
+      var cpt = 0;
+      window.onload = function () {
+         socket = io.connect('https://' + location.host);
+         socket.emit('connect-prof', { "sequence_id": "{{ sequence.id_unique }}" });
+
+         socket.on('connect-etu', function (data) {
+            $('#etu-count').text(data['count']);
+         });
+
+         socket.on('display-question', function (data) {
+            console.log(data);
+            display(data);
+         });
+
+         socket.on('refresh-answers', function (data) {
+            console.log(data);
+            refreshAnswers(data);
+         });
+
+         socket.on('show-correction', function (data) {
+            displayCorrectionHere(data);
+         });
+
+         socket.on('end-sequence-prof', function (data) {
+            window.location.href = data;
+         });
+         socket.on('fermer-sequence-prof', function (data) {
+            window.location.href = data;
+         });
+
+         
+         socket.on('show-word-cloud', function (dat) {
+            showWordCloud(dat);
+
+         });
+
+      }
+
+      function refreshAnswers(data) {
+         $('#rep-count').text(data['rep_count']);
+         if (data['type'] == 'Alphanumerique') {
+            answers.innerHTML = '';
+            var btndiv = document.createElement('div');
+            btndiv.className = 'answer form-check form-switch';
+            var btn = document.createElement('input');
+            btn.className = 'isCorrect form-check-input answers-btn';
+            btn.type = 'checkbox';
+            btn.name = 'correct';
+            btn.id = 'flexSwitchCheckDefault';
+            btn.checked = true;
+            btndiv.appendChild(btn);
+            answers.appendChild(btndiv);
+
+            reponsesDict = data["answers"];
+
+            for (let reponse in reponsesDict) {
+               var nbReponses = reponsesDict[reponse];
+               var input = creerAlphanumeriqueInput(reponse, nbReponses, data["total"]);
+               answers.appendChild(input);
+            }
+
+         } else if (data['type'] == 'ChoixMultiple') {
+            for (var i = 0; i < Object.keys(data["answers"]).length; i++) {
+               var nbReponses = data["answers"][i];
+               if (data["total"] == 0)
+                  var pourcentage = 0;
+               else
+                  var pourcentage = nbReponses / data["total"] * 100;
+               console.log("reponse " + i + ", % : " + pourcentage);
+               var progressBar = document.getElementById("progress-bar" + i);
+               progressBar.style.width = pourcentage + '%';
+               progressBar.setAttribute('aria-valuenow', pourcentage);
+            }
+         }
+      }
+
+      function stopReponses() {
+         socket.emit('stop-answers', { "sequence_id": "{{ sequence.id_unique }}" });
+         socket.on('stop-answers', function (data) {
+            if (data != "libre"){
+               let btnStopReponses = document.getElementById('btn-stop-reponses');
+               let btnShowCorrection = document.getElementById('btn-show-correction');
+               btnStopReponses.classList.add('d-none');
+               btnShowCorrection.classList.remove('d-none');
+            }
+         });
+      }
+
+      function stopSequence() {
+         socket.emit('fermer-sequence', { "sequence_id": "{{ sequence.id_unique }}" });
+      }
+
+      function nextQuestion() {
+         var next_button = document.getElementById('next_button');
+         socket.emit('next-question', { "sequence_id": "{{ sequence.id_unique }}" });
+         let btnStopReponses = document.getElementById('btn-stop-reponses');
+         let btnShowCorrection = document.getElementById('btn-show-correction');
+         btnStopReponses.classList.remove('d-none');
+         btnShowCorrection.classList.add('d-none');
+      }
+
+      function displayCorrectionHere(data) { // TO CONTINUE
+         switch (type) {
+            case "ChoixMultiple":
+               console.log("data : ");
+               console.log(data);
+               var answers = document.getElementsByClassName('answer-html');
+               console.log("answers : ");
+               console.log(answers);
+               for (var i = 0; i < answers.length; i++) {
+                  if (data[answers[i].id.split('-')[1]]["isCorrect"] == "true") {
+                     answers[i].classList.add("answer-correct");
+                  } else {
+                     answers[i].classList.add("answer-wrong");
+                  }
+               }
+               break;
+            case "Alphanumerique":
+               var answer_container = document.getElementById('answers');
+               var reponses = document.getElementsByClassName('reponse-alphanum');
+               var trouve = false;
+               for (var i = 0; i < reponses.length; i++) {
+                  if (reponses[i].value == data) {
+                     trouve = true;
+                     reponses[i].classList.add("alphanumerique-correct");
+                  } else {
+                     reponses[i].classList.add("alphanumerique-wrong");
+                  }
+               }
+               if (!trouve) {
+                  var input = creerAlphanumeriqueInput(data, 0, 0);
+                  input.childNodes[0].classList.add("alphanumerique-correct");
+                  answer_container.appendChild(input);
+               }
+               break;
+         }
+      }
+
+      function showWordCloud(dat) {
+
+         console.log("dat : ", dat);
+         var counts = dat;
+       
+         var data = Object.entries(counts).map(function(d) {
+           return {
+             text: d[0],
+             value: d[1]
+           };
+         }); // convert object to array of objects with text and value properties 
+       
+         // sort the data by value in descending order
+         data.sort(function(a, b) {
+           return b.value - a.value;
+         });
+       
+         var maxCount = data[0].value; // get the maximum count value
+       
+         var wordCloud = d3.select("#word-cloud").select("svg");
+         if (wordCloud.empty()) {
+           wordCloud = d3.select("#word-cloud").append("svg")
+             .attr("width", 700)
+             .attr("height", 400);
+         } else {
+           // empty the SVG for a new drawing
+           wordCloud.selectAll("*").remove();
+         }
+       
+         var fontSizeScale = d3.scaleLinear()
+           .domain([0, maxCount])
+           .range([15, 30]);
+       
+           var colorScale = d3.scaleLinear()
+            .domain([0, maxCount])
+            .range(["#FFA500", "#FFFF00"]); // dark yellow to yellow
+
+
+         
+       
+         var layout = d3.layout.cloud()
+           .size([500, 300])
+           .words(data)
+           .padding(20)
+           .rotate(function() {
+             return 0;
+           })
+           .fontSize(function(d) {
+             return fontSizeScale(d.value);
+           })
+           .on("end", draw);
+       
+         layout.start();
+       
+         function draw(words) {
+            var centerX = 350; // change the X position to center the first word
+            var centerY = 250;
+            var maxRadius = 225;
+            var angleStep = 2 * Math.PI / words.length;
+            var angle = 0;
+            var wordIndex = 0;
+            
+            var centerGroup = wordCloud.append("g")
+              .attr("transform", "translate(" + centerX + "," + centerY + ")");
+            
+            centerGroup.append("text")
+              .text(words[0].text)
+              .style("font-size", fontSizeScale(words[0].value) + "px")
+              .style("fill", function(d) { return colorScale(words[0].value); });
+            
+            var wordsGroup = wordCloud.selectAll("g")
+              .data(words)
+              .enter().append("g")
+              .attr("transform", function(d) {
+                if (d == words[0]) return; // skip the center word
+                // randomize the positions of the other words
+                var radius = Math.random() * maxRadius;
+                var x = centerX + radius * Math.cos(angle) + Math.random() * 100 - 50;
+                var y = centerY + radius * Math.sin(angle) + Math.random() * 100 - 50;
+                angle += angleStep;
+                return "translate(" + x + "," + y + ")";
+              });
+            
+            wordsGroup.append("text")
+              .text(function(d) { return d.text; })
+              .style("font-size", function(d) { return fontSizeScale(d.value) + "px"; })
+              .style("fill", function(d) { return colorScale(d.value); });
+          }
+            
+       }   
+
+
+      function showCorrection() {
+         socket.emit('show-correction', { "sequence_id": "{{ sequence.id_unique }}" });
+         let btnStopReponses = document.getElementById('btn-stop-reponses');
+         let btnShowCorrection = document.getElementById('btn-show-correction');
+         btnStopReponses.classList.add('d-none');
+         btnShowCorrection.classList.add('d-none');
+      }
+
+      function creerProgressBar(pourcentage, id) {
+         var progress = document.createElement('div');
+         progress.className = 'progress';
+         progress.style.width = '80%';
+         progress.style.margin = '12px';
+         var progressBar = document.createElement('div');
+         progressBar.className = 'progress-bar';
+         progressBar.role = 'progressbar';
+         progressBar.id = "progress-bar" + id;
+         progressBar.style.width = pourcentage + '%';
+         progressBar.setAttribute('aria-valuenow', pourcentage);
+         progressBar.setAttribute('aria-valuemin', '0');
+         progressBar.setAttribute('aria-valuemax', '100');
+         progress.appendChild(progressBar);
+         return progress;
+      }
+
+      function creerAlphanumeriqueInput(reponse, nb, total) {
+         var pourcentage = (nb / total) * 100;
+
+         var wrapper = document.createElement('div');
+         wrapper.className = 'answer form-check form-switch answer-js flex-col-center-center';
+
+
+         var input = document.createElement('input');
+         input.type = 'text';
+         input.className = 'form-control answer-js';
+         input.id = 'reponse';
+         input.classList.add('reponse-alphanum');
+         input.name = 'reponse';
+         input.readOnly = true;
+         input.value = reponse;
+         wrapper.appendChild(input);
+
+         var progress = creerProgressBar(pourcentage, "");
+         wrapper.appendChild(progress);
+         return wrapper;
+      }
+
+      function creerChoixMultipleInput(reponse, id, nb, total) {
+         var pourcentage = (nb / total) * 100;
+
+         var div = document.createElement('div');
+         div.className = 'answer form-check form-switch answer-js flex-col-center-center';
+         div.style.padding = '10px';
+
+         var answ = document.createElement('div');
+         answ.className = 'answer-html';
+         answ.id = 'answer-' + id;
+         answ.innerHTML = reponse;
+         div.appendChild(answ);
+
+         var progress = creerProgressBar(pourcentage, id);
+         div.appendChild(progress);
+         return div;
+      }
+
+      function display(question) {
+         // Afficher Suivant ou Terminer sur le bouton
+         console.log(question)
+
+         var next_button = document.getElementById('next_button');
+         if (question['position'] < question['total']) {
+            next_button.textContent = 'Suivant';
+         } else {
+            next_button.textContent = 'Terminer';
+         }
+         // Affichage du titre de la question 
+         var questionTitle = document.getElementById('question-titre');
+         questionTitle.textContent = question['question']['titre'];
+         // Affichage du N° de la question courante
+         var questionNb = document.getElementById('question-nb');
+         questionNb.textContent = question['position'];
+         // Affichage de la question
+         var qst = document.getElementById('qst');
+         qst.innerHTML = question['question']['text'];
+         // Affichage des réponses
+         if(question['question']['type'] != 'libre'){
+            var answers = document.getElementById('answers');
+
+            answers.innerHTML = '';
+            var btndiv = document.createElement('div');
+            btndiv.className = 'answer form-check form-switch';
+            var btn = document.createElement('input');
+            btn.className = 'isCorrect form-check-input answers-btn';
+            btn.type = 'checkbox';
+            btn.name = 'correct';
+            btn.id = 'flexSwitchCheckDefault';
+            btn.checked = true;
+            btn.onchange = function () { toggleDisplayAnswers(this); };
+            btndiv.appendChild(btn);
+            answers.appendChild(btndiv);            
+         } else if (question['question']['type'] == 'libre') {
+            var answers = document.getElementById('answers');
+            answers.parentNode.removeChild(answers);
+         }
+
+
+         type = question['question']['type'];
+         if (type == "ChoixMultiple") {
+            for (var i = 0; i < question['question']['answers'].length; i++) {
+               var reponse = question['question']['answers'][i]['text'];
+
+               var input = creerChoixMultipleInput(reponse, i, 0, 100);
+               answers.appendChild(input);
+            }
+         }
+         mermaid.init();
+         MathJax.typeset();
+      }
+
+      function toggleDisplayAnswers(checkbox) {
+         if (checkbox.checked) {
+            socket.emit('toggleDisplayAnswers', { "sequence_id": "{{ sequence.id_unique }}", "display": true });
+         } else {
+            socket.emit('toggleDisplayAnswers', { "sequence_id": "{{ sequence.id_unique }}", "display": false });
+         }
+      }
+   </script>
+</head>
+
+<body>
+   <div>
+      <div class="container-fluid bg-dark text-light py-3">
+         <header class="text-center">
+            {% if length > 1 %}
+            <h2 class="display-6">Code de la sequence : {{ sequence.id_unique }}</h2>
+            {% else %}
+            <h2 class="display-6">Code de la question : {{ questions[0].id }}</h2>
+            {% endif %}
+            <h3>Nombre d'étudiants connectés : <strong id="etu-count">0</strong></h3>
+            <h3>Nombre de réponses : <strong id="rep-count">0</strong></h3>
+         </header>
+      </div>
+   </div>
+   <center>
+      <div class="row-container">
+
+         <div class="card bg-dark col-4 question" id="card">
+            <div class="card-body flex-col-center-center">
+               <div style="align-items: center;  width: 100%">
+                  <h6 id="question-titre" class="card-subtitle mb-2 text-muted">Titre question ???</h6>
+                  <button type="button" id="next_button" class="btn btn-outline-success"
+                     style="float :right; display:block;position: absolute; top:0;right: 0;"><i
+                        class="bi bi-arrow-right-circle"></i> Salut (test) </button>
+               </div>
+               <div>
+                  <label for="qst" class="text-light">Question <strong id="question-nb" class="text-light">0</strong>
+                     :</label>
+               </div>
+
+               <div id="qst" name="text"
+                  style="background-color: #EBFCCB; border-radius: 15px; color:black; height: auto; min-height: 100px; width: 300px; display: flex; text-align: center; justify-content: center; flex-direction:column;">
+                  <div class="answer form-check form-switch">
+                     <input class="form-check-input" type="checkbox" id="toggledisplay-answers"
+                        style="float :right; display:block;position: relative; top:0;right: 0;" checked>
+                  </div>
+               </div>
+            </div>
+
+            <div id="answers" class="container my-2 bg-dark w-80 text-light p-2"
+               style="display:flex; flex-direction: column;justify-content: center;align-items: center; padding: 10px;">
+            </div>
+            <div>
+               <button id="btn-stop-reponses" class="btn btn-outline-warning" onclick="stopReponses()">Stopper les
+                  réponses</button>
+               <button id="btn-stop-reponses" class="btn btn-outline-danger" onclick="stopSequence()"
+                  style="float :right; display:block;position: absolute; top:0;left: 0;">Arrêter</button>
+
+            </div>
+            <div>
+               <button id="btn-show-correction" class="d-none btn btn-outline-success" onclick="showCorrection()"
+                  style="margin-top : 10px;">Afficher la correction</button>
+            </div>
+            <div>
+               <button id="btn-show-word-cloud" class="d-none btn btn-outline-success" onclick="showWordCloud()"
+                  style="margin-top : 10px;">Afficher le nuage</button>
+            </div>
+         </div>
+         <div style = "margin: 15px;">
+            <div id="word-cloud" style=" display:flex; align-items: center; justify-content: center;"></div>            
+         </div>
+
+   </center>
+
+   <script>
+      mermaid.initialize({
+         startOnLoad: true
+      });
+
+      var next_button = document.getElementById('next_button');
+      next_button.addEventListener("click", function () {
+         nextQuestion();
+      });
+   </script>
+
+</body>
+
+</html>

@@ -1,0 +1,12 @@
+.dropzone {
+    border: 2px dashed #ddd;
+    border-radius: 5px;
+    width: 500px;
+    height: 300px;
+    text-align: center;
+    padding-top: 80px;
+  }
+  .dropzone p {
+    font-size: 18px;
+    color: #aaa;
+  }

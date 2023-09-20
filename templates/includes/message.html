@@ -1,0 +1,45 @@
+<html>
+   <body>
+      {% if error is defined %}
+      {% if error != "" %}
+      <div class=" alert alert-danger alert-dismissible fade show" role="alert" id = "danger" style="">
+         <strong>Erreur !</strong> {{ error }}
+         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+      </div>
+      {% endif %}
+      {% else %}
+         {% if message is defined %}
+         {% if message != "" %}
+         <div class=" alert alert-success alert-dismissible fade show" role="alert" id= "success" style="">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+         </div>
+         {% endif %}
+         {% endif %}
+      {% endif %}
+   </body>
+   
+   <script type="text/javascript">
+      if((document.getElementById("danger") != null)){
+         
+         function showDanger() {
+         var danger = document.getElementById("danger")
+         danger.style = "visibility : hidden;";
+         }
+         
+         setTimeout("showDanger()", 5000); // aprés 5 sec
+      }
+      
+      if(document.getElementById("success") != null){
+         
+         function showSuccess() {
+            success = document.getElementById("success")
+            success.style = "visibility : hidden;";
+         }
+         
+            setTimeout("showSuccess()", 5000); // aprés 5 sec
+      }
+     </script>
+
+</html>
+

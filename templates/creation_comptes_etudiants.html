@@ -1,0 +1,49 @@
+<html>
+
+<head>
+
+   <title>Importer comptes étudiant</title>
+   {% include 'includes/head_common.html' %}
+
+   <script type="module" src="//unpkg.com/@grafikart/drop-files-element"></script>
+
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+   <script src="{{ url_for('static', filename = 'creationEtu.js') }} "></script>
+
+</head>
+
+<body>
+   <center>
+      <nav class="navbar navbar-expand-md navbar-light bg-dark">
+         <div class="container-fluid">
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+               <div class="btn-group" style="display: flex; justify-content: space-between;">
+                  <a class="btn btn-dark text-light" href="{{ url_for('logout') }}"
+                     onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                     Se déconnecter</a>
+                  <a class="btn btn-dark text-light" href="{{ url_for('questions') }}"
+                     onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">
+                     Vos questions</a>
+               </div>
+            </div>
+         </div>
+      </nav>
+      <div>
+         <form method="post" enctype="multipart/form-data" id="my-great-dropzone">
+            <div>
+               <input type="file" name="csv_file" label="Cliquez pour parcourir vos fichiers." is="drop-files"
+                  help=" ou bien glissez votre fichier" />
+            </div>
+            <input type="submit" class="btn btn-success text-light" style="margin: 10px;" value="Ajouter">
+         </form>
+      </div>
+   </center>
+
+</body>
+
+</html>

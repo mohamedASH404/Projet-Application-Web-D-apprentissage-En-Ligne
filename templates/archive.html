@@ -1,0 +1,48 @@
+<html>
+
+<head>
+   <title>Archive {{ sequence_id }}</title>
+   {% include 'includes/head_common.html' %}
+</head>
+
+<body>
+   <center>
+      {% include 'includes/navbar_prof.html' %}
+      {% include 'includes/message.html' %}
+      <div id="sequences" class="container">
+      <h1 style="color:white">Séquence {{ sequence_id }}</h1>
+         <div id="archives-container">
+            <table id="archives-table" class="table">
+               <thead>
+                  <tr>
+                  <th>Etudiant</th>
+                  {% for question in sequence.questions %}
+                     <th>{{ question.titre }} </th>
+                  {% endfor %}
+                  </tr>
+               </thead>
+               <tbody>
+                  {% for etudiant in etudiants %}
+                  <tr class="highlighted-row">
+                     <td>{{ etudiant.nom|capitalize }} {{ etudiant.prenom|capitalize }}<br>N° etu : {{ etudiant.numero_etudiant }}</th>
+
+                     {% for reponse in etudiant.reponses %}
+                        <td style="vertical-align: middle;">
+                           {% if reponse and not reponse is string %}
+                              <span class="badge bg-success">Correct</span>
+                           {% elif not reponse  %}
+                              <span class="badge bg-danger">Incorrect</span>
+                           {% else %}
+                              <span class="badge bg-info">{{ reponse }}</span>
+                           {% endif %}
+                        </td>
+                     {% endfor %}
+                  </tr>
+                  {% endfor %}
+               </tbody>
+            </table>
+         </div>
+      </div>   
+   </center>
+</body>
+</html>

@@ -1,0 +1,48 @@
+<html>
+
+<head>
+    <title>Créer question</title>
+    {% include 'includes/head_common.html' %}
+    <script src="{{ url_for('static', filename = 'questions_functions.js') }} "></script>
+
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css"
+        rel="stylesheet" />
+    <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+        integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+        integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+    <div>
+        <div class="container-fluid bg-dark text-light py-3">
+            <header class="text-center">
+                <h1 class="display-6"> Création de question </h1>
+            </header>
+        </div>
+    </div>
+    <center style="display:flex ; flex-direction: row; justify-content: center; margin-top: 5% ;">
+        <section class="container my-2 bg-dark w-60 text-light p-2 col-12"
+            style="box-shadow: 0px 0px 10px white; padding: 5px; display:flex ; flex-direction: column; justify-content: center; ">
+            <div id="type-container">
+                <h3 class="text-light" style="margin: 10px;">Choisissez un type de réponse</h3>
+                <form action="{{url_for('traiter_type')}}" method="post">
+                    <div class="input-group" style="justify-content: center">
+                        <div class="form-outline" style="display:flex ; flex-direction: row; justify-content: center;">
+                            <select id="search-focus" type="select" id="form1" class="form-select" placeholder="Types"
+                                name="type">
+                                <option value="Alphanumerique">Numérique</option>
+                                <option value="ChoixMultiple">Choix multiples</option>
+                                <option value="libre">libre</option>
+                            </select>
+                            <button type="submit" class="btn btn-success" style="margin-left: 10px"
+                                onclick>valider</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+    </center>
+</body>
+
+</html>

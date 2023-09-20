@@ -1,0 +1,159 @@
+<html>
+
+<head>
+   <title>Générer un Contrôle</title>
+   {% include 'includes/head_common.html' %}
+
+   <script src="{{ url_for('static', filename = 'questions_functions.js') }} "></script>
+
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+
+   <!-- Sliders de selection du nombre de questions -->
+   <script src="https://cdn.jsdelivr.net/npm/range-slider-input@2.4/dist/rangeslider.umd.min.js"></script>
+   <script>
+      var etiquettes = {{ etiquettes|tojson }};
+      var selectedQuestions = {};
+      for (let i = 0; i < etiquettes.length; i++) {
+         selectedQuestions[etiquettes[i].etiquette] = [0, 0];
+      }
+
+      function etuRadioUpdate() {
+         var radioId = document.getElementById("radio-id");
+         var radioIdLabel = document.getElementById("radio-id-label");
+         var radioAnonLabel = document.getElementById("radio-anon-label");
+         if (radioId.checked) {
+            radioIdLabel.classList.add("active");
+            radioAnonLabel.classList.remove("active");
+         } else {
+            radioIdLabel.classList.remove("active");
+            radioAnonLabel.classList.add("active");
+         }
+      }
+      function triRadioUpdate() {
+         var radioId = document.getElementById("radio-tri");
+         var radioIdLabel = document.getElementById("radio-tri-label");
+         var radioAnonLabel = document.getElementById("radio-alea-label");
+         if (radioId.checked) {
+            radioIdLabel.classList.add("active");
+            radioAnonLabel.classList.remove("active");
+         } else {
+            radioIdLabel.classList.remove("active");
+            radioAnonLabel.classList.add("active");
+         }
+      }
+   </script>
+</head>
+
+<body  class="text-light">
+   <center>
+      {% include 'includes/navbar_prof.html' %}
+      {% include 'includes/message.html' %}
+      <div>
+         <h3 style="margin: 10px;">Création d'un contrôle</h3>
+      </div>
+      <form method="post">
+         <fieldset style="margin-bottom: 55px; margin-top: 45px">
+            <legend style="font-size: 18px">Identification des étudiants </legend>
+            <div class="container" style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+               <label class="radio-id active" id="radio-id-label">
+                  Etudiants identifiés
+                  <input id="radio-id" type="radio" name="identification" value="identifies" onclick="etuRadioUpdate()" checked>
+               </label>
+               <label class="radio-id" id="radio-anon-label">
+                  Etudiants anonymes
+                  <input id="radio-anon" type="radio" name="identification" value="anonymes" onclick="etuRadioUpdate()">
+               </label>
+            </div>
+         </fieldset>
+
+         <fieldset style="margin-bottom: 55px; margin-top: 45px">
+            <legend style="font-size: 18px">Tri du contrôle </legend>
+            <div class="container" style="display: flex; flex-direction: row; align-items: center; justify-content: center;">
+               <label class="radio-id active" id="radio-tri-label">
+                  Questions triées par étiquette
+                  <input id="radio-tri" type="radio" name="ordre" value="tri" onclick="triRadioUpdate()" checked>
+               </label>
+               <label class="radio-id" id="radio-alea-label">
+                  Questions en ordre aléatoire
+                  <input id="radio-alea" type="radio" name="ordre" value="aleatoire" onclick="triRadioUpdate()">
+               </label>
+            </div>
+         </fieldset>
+         <div style="margin-bottom: 35px;">
+            <label for="nb_questions">Nombre de questions</label>
+            <input type="number" name="nb_questions" id="nb_questions" placeholder="Nombre de questions" min="1" onkeypress="updateSubmitBtn()" onchange="updateSubmitBtn()" required>
+         </div>
+         <div style="margin-bottom: 35px;">
+            <label for="nb_controles">Nombre de contrôles</label>
+            <input type="number" name="nb_controles" id="nb_controles" placeholder="Nombre de contrôles" min="1" onkeypress="updateSubmitBtn()" onchange="updateSubmitBtn()" required>
+         </div>
+         <div class="container" id="range-qst">
+            {% for etiquette in etiquettes %}
+               <div class="etiquette-slider">
+                  <div class="slider-label">
+                     <!-- Delete button to reset the values of the slider __>
+                     <button type="button" class="btn btn-danger" onclick="resetSlider('{{ etiquette.etiquette }}')"> Reset
+                        <i class="fas fa-times"></i></button -->
+                     <label for="slider-{{ etiquette.etiquette }}">{{ etiquette.etiquette }} <em style="font-size: 18px">({{ etiquette.nb }} questions)</em></label>
+                     <p> : <strong id="displaymin-{{ etiquette.etiquette }}">0</strong> - <strong id="displaymax-{{ etiquette.etiquette }}">0</strong></p>
+                  </div>
+                  <div id="slider-{{ etiquette.etiquette }}" class="range-slider"></div>
+               </div>
+            {% endfor %}
+         </div>
+         <p id="submit-error"></p>
+         <input type="hidden" name="composition" value="" id="json-questions">
+         <input type="submit" value="Générer" style="margin: 10px;" class="btn btn-success" id="submit">
+      </form>
+   </center>
+   <script>
+      function updateSubmitBtn() {
+         var min = 0;
+         var max = 0;
+         for (let i = 0; i < etiquettes.length; i++) {
+            min += selectedQuestions[etiquettes[i].etiquette][0];
+            max += selectedQuestions[etiquettes[i].etiquette][1];
+         }
+         var nb_questions = document.getElementById('nb_questions').value;
+         if (min <= nb_questions && nb_questions <= max) {
+            document.getElementById('submit-error').style.display = "none";
+            document.getElementById('submit').disabled = false;
+         } else {
+            document.getElementById('submit').disabled = true;
+            document.getElementById('submit-error').innerHTML = "";
+            document.getElementById('submit-error').style.display = "block";
+            if (min > nb_questions) {
+               document.getElementById('submit-error').innerHTML += "Le nombre de questions minimum est trop élevé <br>(" + min + " questions minimum sélectionnées)<br>";
+            }
+            if (max < nb_questions) {
+               document.getElementById('submit-error').innerHTML += "Le nombre de questions maximum est trop faible <br>(" + max + " questions maximum sélectionnées)<br>";
+            }
+         }
+         var jsonQuestions = document.getElementById('json-questions');
+         jsonQuestions.value = JSON.stringify(selectedQuestions);
+      }
+   </script>
+   <script>
+      {% for etiquette in etiquettes %}
+         var slider = document.getElementById('slider-{{ etiquette.etiquette }}');
+         rangeSlider(slider, {
+            min: 0,
+            max: "{{ etiquette.nb }}",
+            step: 1,
+            value: [0, 0],
+            onInput: function (value, userInteraction) {
+               document.getElementById('displaymin-{{ etiquette.etiquette }}').textContent = value[0];
+               document.getElementById('displaymax-{{ etiquette.etiquette }}').innerHTML = value[1];
+               selectedQuestions["{{ etiquette.etiquette }}"] = value;
+               updateSubmitBtn();
+            }
+         });
+      {% endfor %}
+   </script>
+</body>
+
+</html>

@@ -1,0 +1,341 @@
+
+
+#loginSec{
+    box-shadow: 0px 0px 10px rgb(213, 0, 213); 
+    border-radius: 25% 10%; 
+    padding: 5px; 
+    background-color: #63007290;
+    display:flex ; 
+    flex-direction: column; 
+    justify-content: center; 
+    height: 43%;
+    width: 400px;
+}
+
+#log{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    background:linear-gradient(rgba(0, 47, 2, 0.664), transparent),  url(bg2.jpeg);
+    background-size: cover;
+    background-attachment: fixed;
+} 
+
+.login{
+    width : 360px;
+    height: min-content;
+    padding: 20px;
+    display:flex ; 
+    flex-direction: column; 
+    justify-content: center;
+
+}
+
+.login h1 {
+    font-size: 36px;
+    margin-bottom: 25px;
+
+}
+
+.login form {
+    font-size: 20px;
+}
+
+.login form .form-group {
+    margin-bottom: 12px;
+}
+
+.login form input[type="submit"] {
+    font-size: 20px;
+    margin-top: 15px;
+}
+
+#inscrSec{
+    box-shadow: 0px 0px 10px rgb(213, 0, 213); 
+    border-radius: 25% 10%; 
+    padding: 5px; 
+    background-color: #63007290;
+    display:flex ; 
+    flex-direction: column; 
+    justify-content: center; 
+    height: 40%;
+    width: 110%;
+}
+
+.editDelet {
+    text-align: right;
+}
+
+.question {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#etiquettes-list {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 20px;
+}
+
+.etiquette, .etiquettes {
+    display: flex;
+    flex-direction: row;
+}
+
+.etiquettes p {
+    margin: 10px;
+    border: 1px solid grey;
+    padding: 5px;
+    border-radius: 5px;
+}
+
+/*********************PAGE ACC************************/
+
+#logo{
+    flex: 2 1 40rem;
+    font-family: "Pacifico", cursive;
+}
+.hero {
+    background:linear-gradient(rgb(0,0,0), transparent), url(cube.jpg);
+    min-height: 98vh;
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center
+
+  }
+  
+/*
+.hero{
+    padding: 0;
+    margin: 0;
+    min-height: 94.5vh;
+    background:linear-gradient(rgb(0,0,0), transparent),  url(cube.jpg);
+    background-position: cover;
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+*/
+
+.hero h2{
+    padding: 3rem;
+    font-weight : normal; 
+}
+
+body{
+    font-family: "Rockwell" ,sans-serif;
+}
+
+/*********************PAGE GENERER************************/
+
+.etiquette-filtre {
+    pointer-events:none;
+    margin: 5px;
+    border: 1px solid grey;
+    border-radius: 25px;
+    background-color: #ffffff;
+    text-align: center;
+    width: fit-content;
+}
+
+code {
+    display: table;
+}
+
+.questions-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.qst-text {
+    background-color: #EBFCCB;
+    padding: 0 50px;
+    border-radius: 15px;
+    color:black;
+    height: auto;
+    min-height: 100px;
+    width: 80%;
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    flex-direction:column;
+}
+
+.radio-id {
+    width: fit-content;
+    min-width: 20%;
+    height: 40px;
+    border-radius: 50px;
+    background-color: #343a40;
+    margin: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: all 0.3s ease-in-out;
+}
+
+.radio-id:hover {
+    background-color: rgb(94, 94, 94);
+}
+
+/* target the radio-id that have a checked input in its children */
+.radio-id.active {
+    background-color: #2196f3 !important;
+}
+
+.radio-id input {
+    display: none;
+}
+
+#range-qst {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.slider-label {
+    font-size: 22px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+}
+
+.slider-label p {
+    margin: 5px;
+    font-size: 22px;
+}
+
+.etiquette-slider {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 35px;
+}
+
+.range-slider {
+    width: 30vw;
+}
+
+
+/*********************LIVEQCM************************/
+
+.live{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+}
+
+.question {
+    width: 25rem; box-shadow: 0px 0px 10px white; padding: 10px; margin: 10px; display : block;
+}
+
+.flex-col-center-center {
+    display:flex; flex-direction:column; justify-content:center; align-items: center;
+}
+
+.answers-btn {
+    float :right; display:block;position: relative; top:0;right: 0; margin-bottom:10px;
+}
+
+.answer-html {
+    border-radius: 30px; background-color:#CBFCF0; overflow: auto; display: inline-block; min-width: 300px; color: black; justify-content: center;
+}
+
+.answer-checked {
+    background-color:#9bdbb0;
+    box-shadow: 0px 0px 15px rgb(0, 155, 160);
+    border: 2px solid rgb(0, 0, 0);
+    font-weight: 600;
+}
+
+.d-none {
+    display: none;
+}
+
+.answer-disabled-choixmultiple {
+    pointer-events: none;
+    cursor: default;
+    background-color: lightgray;
+}
+
+.answer-disabled-alphanumeric {
+    pointer-events: none;
+    cursor: default !important;
+    background-color: lightgray;
+    color: rgb(54, 54, 54);
+}
+
+.answer-correct {
+    background-color: #67e691 !important;
+    color: black !important;
+}
+
+.answer-wrong {
+    background-color: #e66767 !important;
+    color: black !important;
+}
+
+.alphanumerique-correct {
+    background-color: #67e691 !important;
+    color: black !important;
+}
+
+.alphanumerique-wrong {
+    background-color: #e66767 !important;
+    color: black !important;
+}
+
+/*********************ARCHIVES************************/
+
+.clickable-row {
+    cursor: pointer;
+}
+
+.clickable-row:hover {
+    background-color: #575757;
+}
+
+.highlighted-row:hover {
+    background-color: #575757;
+}   
+
+
+
+#archives-container {
+    background-color: #343a40;
+    padding: 20px;
+    color: white;
+    border-radius: 10px;
+}
+
+#archives-table {
+    margin-top: 20px;
+    background-color: #343a40;
+    color: white;
+
+}

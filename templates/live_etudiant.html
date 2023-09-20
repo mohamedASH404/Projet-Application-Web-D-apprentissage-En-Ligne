@@ -1,0 +1,288 @@
+<html>
+
+<head>
+   <title>Live etudiant</title>
+   {% include 'includes/head_common.html' %}
+   {% include 'includes/head_visualiser.html' %}
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"
+      integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=="
+      crossorigin="anonymous"></script>
+   <script>
+      var socket;
+      var num;
+      var id;
+
+      var type;
+      var reponsesOuvertes = false;
+      var reponses;
+
+      window.onload = function () {
+         // Initialisation de la connexion au serveur
+         socket = io.connect('https://' + location.host);
+         num = "{{ etudiant.numero_etudiant }}"
+         console.log(num)
+         id = "{{ sequence.id_unique }}"
+         console.log(id)
+         socket.emit('connect-etu', { "numero_etudiant": num, "sequence_id": id });
+
+         // Affichage de la question courante
+         socket.on('display-question', function (data) {
+            display(data);
+            ouvrirReponses()
+         });
+
+         // Désactivation du bouton d'envoi de réponse si le professeur a stoppé les réponses
+         socket.on('stop-answers', function () {
+            fermerReponses();
+         });
+
+         // Affichage de la correction
+         socket.on('show-correction', function (data) {
+            showCorrection(data);
+         });
+
+         socket.on('error', function (data) {
+            alert(data.message);
+            ouvrirReponses();
+         });
+
+         socket.on('toggleDisplayAnswers', function (data) {
+            toggleDisplayAnswers(data["display"]);
+         });
+
+         socket.on('end-sequence-etudiant', function (data) {
+            window.location.href = data;
+         });
+         socket.on('fermer-sequence-etudiant', function (data) {
+            window.location.href = data;
+         })
+      };
+
+
+
+      // Afficher / cacher les réponses
+      function toggleDisplayAnswers(display) {
+         if (display) {
+            $('#answers').show();
+         } else {
+            $('#answers').hide();
+         }
+      }
+
+      // Affichage de la correction
+      function showCorrection(data) {
+         console.log("Correction reçue :");
+         console.log(data);
+         switch (type) {
+            case "ChoixMultiple":
+               var answers = document.getElementsByClassName('answer-js');
+               for (var i = 0; i < answers.length; i++) {
+                  if (data[answers[i].id.split('-')[1]]["isCorrect"] == "true") {
+                     answers[i].children[0].classList.add("answer-correct");
+                  } else {
+                     answers[i].children[0].classList.add("answer-wrong");
+                  }
+               }
+               break;
+            case "Alphanumerique":
+               var reponse = document.getElementById('reponse');
+               console.log("reponse etu : " + reponse.value);
+               console.log("reponse prof : " + data);
+               if (reponse.value == data) {
+                  reponse.classList.add("alphanumerique-correct");
+               } else {
+                  reponse.classList.add("alphanumerique-wrong");
+               }
+
+               break;
+         }
+         fermerReponses();
+      }
+
+      // Afficher la réponse en 
+
+      // Envoi de la réponse à la question courante (désactive le bouton d'envoi après envoi)
+      function sendAnswer() {
+         if (confirm("Voulez-vous vraiment envoyer votre réponse ?")) {
+            reponses = [];
+            if (type == 'ChoixMultiple') {
+               var answers = document.getElementsByClassName('answer-js');
+               for (var i = 0; i < answers.length; i++) {
+                  if (answers[i].hasAttribute('checked')) {
+                     reponses.push(answers[i].id.split('-')[1]);
+                  }
+               }
+            } else if (type == 'Alphanumerique' || type == 'libre') {
+               reponses.push(document.getElementById('reponse').value);
+            }
+            console.log("reponses : " + reponses + " id : " + id + " : " + num)
+            socket.emit('send-answer', {
+               'numero_etudiant': num,
+               'sequence_id': id,
+               'answers': reponses
+            });
+            fermerReponses();
+            console.log("Réponses envoyées :");
+            console.log(reponses);
+            console.log("Type : " + type);
+         }
+      }
+
+      function fermerReponses() {
+         reponsesOuvertes = false;
+         let btnSendAnswer = document.getElementById('btn-send-answer');
+         btnSendAnswer.disabled = true;
+         if (type == 'ChoixMultiple') {
+            var answers = document.getElementsByClassName('answer-js');
+            for (var i = 0; i < answers.length; i++) {
+               answers[i].children[0].classList.add("answer-disabled-choixmultiple");
+            }
+         } else if (type == 'Alphanumerique') {
+            var reponse = document.getElementById('reponse');
+            reponse.readOnly = true;
+            reponse.classList.add("answer-disabled-alphanumeric");
+         }
+      }
+
+      function ouvrirReponses() {
+         reponsesOuvertes = true;
+         let btnSendAnswer = document.getElementById('btn-send-answer');
+         btnSendAnswer.disabled = false;
+         if (type == 'ChoixMultiple') {
+            var answers = document.getElementsByClassName('answer-js');
+            for (var i = 0; i < answers.length; i++) {
+               answers[i].children[0].classList.remove("answer-disabled-choixmultiple");
+            }
+         } else if (type == 'Alphanumerique') {
+            var reponse = document.getElementById('reponse');
+            reponse.readOnly = false;
+            reponse.classList.remove("answer-disabled-alphanumeric");
+         }
+      }
+
+      // Crée un input de type text pour les questions alphanumériques
+      function creerAlphanumeriqueInputEtu(placeholder) {
+         var input = document.createElement('input');
+         input.type = 'text';
+         input.className = 'form-control answer-js';
+         input.id = 'reponse';
+         input.name = 'reponse';
+         input.placeholder = placeholder;
+         answers.appendChild(input);
+         return input;
+      }
+
+      // Crée une div cliquable pour les questions à choix multiple
+      function creerChoixMultipleInputEtu(reponse, id) {
+         var div = document.createElement('div');
+         div.className = 'answer form-switch answer-js flex-col-center-center';
+         div.style.padding = '10px';
+         div.id = 'answer-' + id;
+         div.style.cursor = 'pointer';
+
+         var answ = document.createElement('div');
+         answ.className = 'answer-html';
+         answ.innerHTML = reponse;
+         div.appendChild(answ);
+
+         MathJax.typeset([answ]);
+
+         div.addEventListener('click', function () {
+            if (reponsesOuvertes) {
+               this.toggleAttribute('checked');
+               if (this.hasAttribute('checked')) {
+                  this.children[0].classList.add('answer-checked');
+               } else {
+                  this.children[0].classList.remove('answer-checked');
+               }
+            }
+         });
+
+         return div;
+      }
+
+      // Affichage de la question courante
+      function display(question) {
+
+         // Affichage du N° de la question courante
+         var questionNb = document.getElementById('question-nb');
+         questionNb.textContent = question['position'];
+         // Affichage de la question
+         var qst = document.getElementById('qst');
+         qst.innerHTML = question['question']['text'];
+         // Affichage des réponses
+         var answers = document.getElementById('answers');
+
+         answers.innerHTML = '';
+
+         type = question['question']['type'];
+         if (type == "ChoixMultiple") {
+            for (var i = 0; i < question['question']['answers'].length; i++) {
+               var reponse = question['question']['answers'][i]['text'];
+
+               var input = creerChoixMultipleInputEtu(reponse, i);
+               answers.appendChild(input);
+            }
+         } else {
+
+               answers.appendChild(creerAlphanumeriqueInputEtu("Saisissez votre réponse"));
+            }
+      }
+
+         // Visualisation des formules mathématiques et des graphes
+         mermaid.init();
+         MathJax.typeset();
+   </script>
+
+</head>
+
+<body>
+   <div>
+      <div class="container-fluid bg-dark text-light py-3">
+         <header class="text-center">
+            <h1 class="display-6">Quizz en direct</h1>
+         </header>
+      </div>
+   </div>
+   <center>
+      <div class="row-container">
+
+         <div class="card bg-dark col-4 question" id="card">
+            <div class="card-body flex-col-center-center">
+               <div>
+                  <label for="qst" class="text-light">Question <strong id="question-nb" class="text-light">0</strong>
+                     :</label>
+               </div>
+
+               <div id="qst" name="text"
+                  style="background-color: #EBFCCB; border-radius: 15px; color:black; height: auto; min-height: 100px; width: 300px; display: flex; text-align: center; justify-content: center; flex-direction:column;">
+                  <div class="answer form-check form-switch">
+                     <input class="isCorrect form-check-input" type="checkbox" name="correct"
+                        id="flexSwitchCheckDefault"
+                        style="float :right; display:block;position: relative; top:0;right: 0;" checked>
+                  </div>
+               </div>
+            </div>
+
+            <div id="answers" class="container my-2 bg-dark w-80 text-light p-2"
+               style="display:flex; flex-direction: column;justify-content: center;align-items: center; padding: 10px;">
+            </div>
+            <button id="btn-send-answer" class="btn btn-primary" id="submit-btn" onclick="sendAnswer()">Valider</button>
+         </div>
+   </center>
+
+   <script>
+      mermaid.initialize({
+         startOnLoad: true
+      });
+   </script>
+
+
+</body>
+
+</html>

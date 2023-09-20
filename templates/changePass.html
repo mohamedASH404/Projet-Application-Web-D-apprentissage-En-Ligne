@@ -1,0 +1,36 @@
+<html>
+
+<head>
+    <title>Changer de mot de passe</title>
+    {% include 'includes/head_common.html' %}
+</head>
+
+<body id="log">
+    <center>
+        {% include 'includes/message.html' %}
+        <section class="container my-2 text-light p-2 col-12" id="loginSec">
+            <div>
+                <header class="text-center">
+                    <h3 class="text-center">Changement de mot de passe</h3>
+                </header>
+            </div>
+            <div class="login" class="container" style="width: auto;">
+                <form onsubmit="return validerSaisie()" method="post">
+                    <div class="form-group was-validated">
+                        <input class="form-control" type="text" name="nouveau" id="login"
+                            placeholder="Nouveau mot de passe.." pattern="[a-zA-Z0-9]+" required>
+                    </div>
+                    <div class="form-group was-validated">
+                        <input class="form-control" type="password" name="confirmer" id="password"
+                            placeholder="Confirmer mot de passe" pattern="[a-zA-Z0-9]+" required>
+                    </div>
+                    <div>
+                        <input class="btn btn-success w-100" type="submit" value="Valider">
+                    </div>
+                </form>
+            </div>
+        </section>
+    </center>
+</body>
+
+</html>

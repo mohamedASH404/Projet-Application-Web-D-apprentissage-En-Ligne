@@ -1,0 +1,76 @@
+<html>
+
+<head>
+   <title>Générer un Quizz</title>
+   {% include 'includes/head_common.html' %}
+
+   <script src="{{ url_for('static', filename = 'questions_functions.js') }} "></script>
+
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+   <center>
+      {% include 'includes/navbar_prof.html' %}
+      <div>
+         <h3 class="text-light" style="margin: 10px;">Selectionnez les questions souhaitées :</h3>
+      </div>
+      <div id="filtre-container" style="display:flex ; flex-direction: row; justify-content: center;">
+         <h4 class="text-light" style="margin: 10px;">Filtrer par étiquette :</h4>
+         <form action="" method="post">
+            <div class="input-group" style="justify-content: center">
+               <div class="form-outline"
+                  style="display:flex ; flex-direction: row; justify-content: center; margin: 10px; ">
+                  <select id="search-focus" type="select" id="form1" class="form-select" placeholder="Etiquette"
+                     name="filtres">
+                     {% for filtre in liste_filtre %}
+                     <option value="{{ filtre }}">{{ filtre }}</option>
+                     {% endfor %}
+                  </select>
+                  <button type="submit" class="btn btn-success" style="margin-left : 5px;" onclick>
+                     <i class="fa fa-search"></i>
+                  </button>
+                  {% if filtres | length > 0 %}
+                  <a href="{{ url_for('generation') }}" class="btn btn-success"
+                     style="margin-left : 10px;">Réinitialiser</a>
+                  {% endif %}
+               </div>
+               <div id="liste-filtre"
+                  style="width: 100%; margin-top: 10px; display:flex; flex-direction:row; justify-content:center;">
+                  {% if filtres != None %}
+                  {% for filtre in filtres %}
+                  <input type="text" class="etiquette-filtre" value="{{ filtre }}" name="filtres" style=" color : green"
+                     readonly>
+                  {% endfor %}
+                  {% endif %}
+               </div>
+         </form>
+      </div>
+      </div>
+      {% for i in range(0, questions | length) %}
+      <div class="container">
+         <form action="{{ url_for('show') }}" method="POST">
+            <div class=" bg-dark text-light " id="check{{i}}"
+               style="margin: 30px; box-shadow: 5px 5px 7px red ; padding: 5px; display:flex ; flex-direction: row; justify-content: center;">
+               <div class="questions" style="display:flex ; flex-direction: row; justify-content: center; margin: 5px;">
+                  <h5 id="text">{{ questions[i].titre }}</h5>
+                  <div class="form-check form-switch" style="margin-left: 10px;">
+                     <input class="form-check-input" type="checkbox" onchange="toGreen(this, '{{i}}')" name="choisi"
+                        value="{{ i }}">
+                  </div>
+               </div>
+            </div>
+      </div>
+      {% endfor %}
+      <div>
+         <input type="submit" class="btn btn-success" value="Créer QCM">
+      </div>
+      </form>
+   </center>
+</body>
+
+</html>

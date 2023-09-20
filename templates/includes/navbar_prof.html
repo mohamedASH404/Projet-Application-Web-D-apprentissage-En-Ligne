@@ -1,0 +1,34 @@
+<nav class="navbar navbar-expand-md navbar-light bg-dark">
+   <div class="container-fluid">
+      <a href="index" style="text-decoration: none;"><h3 class="navbar-brand text-light ml-auto" style="font-family: Pacifico, cursive;">QuizzGalaxy</h3></a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+         aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+         <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+         <div class="navbar-nav">
+            {% if name != None %}
+            <a class="btn btn-dark text-light" href="/questions" style="margin-left: 10px;" onmouseover="this.style.transform='scale(1.1)'"
+               onmouseout="this.style.transform='scale(1)'">Vos questions</a>
+            <a class="btn btn-dark text-light" href="/generation_temp" onmouseover="this.style.transform='scale(1.1)'"
+               onmouseout="this.style.transform='scale(1)'">Générer un QCM</a>
+            <a class="btn btn-dark text-light" href="/sequence" style="margin-left: 10px;"
+            onmouseover="this.style.transform='scale(1.1)'" style="margin-left: 10px;" onmouseout="this.style.transform='scale(1)'">Diffuser QCM</a>
+            <a class="btn btn-dark text-light" href="/archives" style="margin-left: 10px;"
+            onmouseover="this.style.transform='scale(1.1)'" style="margin-left: 10px;" onmouseout="this.style.transform='scale(1)'">Archives</a>
+            <a class="btn btn-dark text-light" href="/creation-comptes-etudiants"
+               onmouseover="this.style.transform='scale(1.1)'" style="margin-left: 10px;" onmouseout="this.style.transform='scale(1)'">Créer
+               comptes étudiants</a>
+         </div>
+         <div class="ms-auto">
+            <a class="btn btn-dark text-light" href="{{ url_for('logout') }}"
+               onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'" >Se
+               déconnecter
+            </a>
+         </div>
+         {% endif %}         
+      </div>
+   </div>
+</nav>
+
+

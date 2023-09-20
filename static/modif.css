@@ -1,0 +1,36 @@
+*{
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: linear-gradient(rgba(0, 47, 2, 0.505), transparent), url(bg2.jpeg);
+    background-size: cover; 
+    background-attachment: fixed;
+    color: white;
+}
+
+
+  .drop-files{
+    border-radius: 5px;
+    width: 500px;
+    
+    text-align: center;
+    background: rgba(0, 0, 0, 0);
+    margin-top: 15%;
+    box-shadow: 0px 0px 30px rgb(134, 0, 0);
+    color: white;
+  }
+  .drop-files__files{
+    display:flex ; 
+    flex-direction: row; 
+    justify-content: center; 
+  }
+
+
+/*
+#dragDrop {
+    display: none;
+}
+/*

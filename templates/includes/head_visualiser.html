@@ -1,0 +1,17 @@
+<!-- Contient toutes les balises nécessaires au fonctionnement de la visualisation -->
+<link href="{{ url_for('static', filename = 'pygments.css') }}" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@9.3.0/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/mermaid@8.5.2/dist/mermaid.min.css">
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+        inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+        displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+        processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+    });
+</script>

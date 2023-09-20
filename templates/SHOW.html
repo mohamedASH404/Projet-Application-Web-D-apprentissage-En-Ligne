@@ -1,0 +1,75 @@
+<html>
+
+<head>
+   <title>Show QCM</title>
+   {% include 'includes/head_common.html' %}
+   {% include 'includes/head_visualiser.html' %}
+   <script src="{{ url_for('static', filename = 'questions_functions.js') }} "></script>
+
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+   <center>
+      {% include 'includes/navbar_prof.html' %}
+      <button type="button" class="btn btn-labeled btn-success " style="margin: 5px; ;" onclick="printContent()">
+         <span class="btn-label navbar-nav ml-auto"><i class="bi bi-printer-fill bi-lg"></i></span>
+      </button>
+      <div class="questions-container" id="toPrint">
+         {%for question in questions %}
+         <div class="card bg-dark col-4 toPrint" id="question-{{questions.index(question)}}"
+            style="width: 40%; box-shadow: 0px 0px 10px white; padding: 10px; margin: 10px;">
+            <div class="card-body"
+               style="display:flex; flex-direction:column; justify-content:center; align-items: center;">
+               <h6 class="card-subtitle mb-2 text-muted">{{ question.titre }}</h6>
+               <label for="qst"><strong class="text-light">Question {{questions.index(question)+1}} :</strong></label>
+               <div id="qst" name="text" class="qst-text">
+                  {{ question.text | safe }}
+               </div>
+            </div>
+            <div id="answers" class="container my-2 bg-dark w-80 text-light p-2"
+               style="display:flex; flex-direction: column;justify-content: center;align-items: center; padding: 10px;">
+
+               {% if question.type == "ChoixMultiple" %}
+               {% for answer in question.answers %}
+               <div class=" answer form-check form-switch"
+                  style="display:flex; flex-direction: row;justify-content: center;align-items: center; padding: 10px;">
+                  <input class="isCorrect form-check-input" type="checkbox" name="correct" id="flexSwitchCheckDefault">
+                  <div
+                     style="border-radius: 30px; background-color:#CBFCF0; overflow: auto; display: inline-block; min-width: 300px; color: black; justify-content: center;">
+                     <p> {{ answer.text | safe }} </p>
+                  </div>
+               </div>
+               {% endfor%}
+               {% elif question.type == "Alphanumerique" %}
+               <input type="text" style="width: 60%;" class="form-control" id="reponse" name="reponse" placeholder="Nombre avec 0 à 2 décimales" readonly>
+               {% endif %}
+
+            </div>
+         </div>
+         {%endfor%}
+      </div>
+
+   </center>
+   <script>
+      function printContent() { 
+         var content = document.getElementsByClassName("toPrint");
+         var printWindow = window.open();
+         printWindow.document.write("<html><head><title>QCM</title></head><body><center>");
+         //printWindow.close();
+         for (var i = 0; i < content.length; i++) {
+            var newcontent = content[i].cloneNode(true);
+            if (i > 0) {
+               newcontent.style.breakInside = "avoid-page";
+            }
+            printWindow.document.write(newcontent.outerHTML);
+         }
+         printWindow.document.write("</center></body></html>");
+         printWindow.print();
+      }
+         
+   </script>
+</body>
+
+</html>

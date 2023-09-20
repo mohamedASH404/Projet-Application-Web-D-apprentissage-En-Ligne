@@ -1,0 +1,31 @@
+<html>
+
+<head>
+   <title>Générer un Quizz / Contrôle</title>
+   {% include 'includes/head_common.html' %}
+
+   <script src="{{ url_for('static', filename = 'questions_functions.js') }} "></script>
+
+   <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.13.2/themes/base/jquery-ui.min.css" rel="stylesheet" />
+   <script src="https://code.jquery.com/jquery-3.6.3.min.js"
+      integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
+   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"
+      integrity="sha256-lSjKY0/srUM9BE3dPm+c4fBo1dky2v27Gdjm2uoZaL0=" crossorigin="anonymous"></script>
+</head>
+
+<body>
+   <center>
+      {% include 'includes/navbar_prof.html' %}
+      <div>
+         <h3 class="text-light" style="margin: 10px;">Générer un Quizz / Contrôle</h3>
+      </div>
+      <div class="container" style="display: flex; flex-direction: row; justify-content: center;">
+      <a href="/generation" class="btn btn-success"
+         style="margin : 10px; width: 40%;">Générer un <strong>Quizz</strong> <br>(choisissez les réponses à inclure)</a>
+      <a href="/controle" class="btn btn-success"
+         style="margin : 10px; width: 40%;">Générer un <strong>Contrôle</strong> <br>(réponses aléatoires dans des bornes choisies)</a>
+      </div>
+   </center>
+</body>
+
+</html>

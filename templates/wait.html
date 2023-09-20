@@ -1,0 +1,63 @@
+<html>
+
+<head>
+  <title>QuizzGalaxy</title>
+  {% include 'includes/head_common.html' %}
+</head>
+
+<nav class="navbar navbar-expand-md navbar-light bg-dark">
+  <div class="container-fluid">
+    <h3 class="navbar-brand text-light" id="logo">QuizzGalaxy</h3>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup"
+      aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+      <div class="navbar-nav ml-auto">
+        {% if etudiant != None %}
+        <a class="btn btn-dark text-light" href="changePass" onmouseover="this.style.transform='scale(1.1)'"
+          onmouseout="this.style.transform='scale(1)'">Changer mdp </a>
+        <a class="btn btn-dark text-light" href="{{ url_for('logoutEtd') }}"
+          onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'">Se
+          déconnecter</a>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</nav>
+
+
+<body class="main-head">
+  <section class="hero">
+    <h2><strong>Bienvenue sur QuizzGalaxy, {{ etudiant.nom }} {{ etudiant.prenom }}</strong></h2>
+    <form action="" method="GET" id="seq_form">
+      <div class="input-group">
+        <div class="form-outline">
+          <input type="search" id="seq_input" class="form-control" name="seq_input" placeholder="Identifiant quizz .."
+            maxlength="8" pattern="[a-zA-Z0-9]+" required />
+        </div>
+        <button type="submit" class="btn btn-success">
+          <i class="fa fa-search"></i>
+        </button>
+      </div>
+    </form>
+  </section>
+  <script>
+    /*{{ url_for('live', id_sequence = seq_input) }}*/
+    const form = document.getElementById('seq_form');
+    const input = document.getElementById('seq_input');
+
+    console.log(input);
+    input.addEventListener('input', () => {
+      const value = input.value.trim();
+      console.log(value);
+      if (value) {
+        form.action = `/live/${value}`;
+      } else {
+        form.action = '';
+      }
+    });
+  </script>
+</body>
+
+</html>

@@ -60,3 +60,6 @@ Questions en direct : [Flask-SocketIO](https://flask-socketio.readthedocs.io/en/
 ### Autres sources
 
 Background images : https://unsplash.com/fr
+
+## Travail en Groupe
+- 4 collaborateurs 
